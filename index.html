@@ -171,9 +171,13 @@
       margin-top: 10px;
     }
 
-    .button-icon {
+    .button-text {
       font-size: 1rem;
-      padding: 5px;
+      color: red; /* Red color for button text */
+      font-weight: bold; /* Bold text */
+      cursor: pointer;
+      border: none;
+      background: none;
     }
 
     .form-group {
@@ -245,8 +249,8 @@
       <h3>Order Details</h3>
       <div id="selected-item-details"></div>
       <label for="order-qty">Order Quantity:</label>
+      <input type="number" id="order-qty" class="narrow" placeholder="000000" inputmode="numeric">
       <div class="radio-group">
-        <input type="number" id="order-qty" class="narrow" placeholder="000000" inputmode="numeric">
         <label><input type="radio" name="unit" value="boxes" checked> Boxes</label>
         <label><input type="radio" name="unit" value="cases"> Cases</label>
       </div>
@@ -274,8 +278,8 @@
       </div>
       <div id="cart-items"></div>
       <div class="buttons">
-        <button class="button-icon" onclick="closeCart()" style="background-color: #6c757d;">Close</button>
-        <button class="button-icon" onclick="exportToPDF()" style="background-color: #007bff;">Export to PDF</button>
+        <button class="button-text" onclick="closeCart()">CLOSE</button>
+        <button class="button-text" onclick="exportToPDF()">EXPORT TO PDF</button>
       </div>
     </div>
   </div>
@@ -292,7 +296,7 @@
         displayItems(json);
       });
 
-       // Display items
+        // Display items
     function displayItems(items) {
       const itemList = document.getElementById('item-list');
       itemList.innerHTML = '';
@@ -386,11 +390,15 @@
 
     // Export to PDF
     function exportToPDF() {
+      const stockistName = document.getElementById('stockist-name').value;
+      const salesmanName = document.getElementById('salesman-name').value;
       const cartContent = document.getElementById('cart-items').innerHTML;
       const win = window.open('', '', 'height=700,width=700');
       win.document.write('<html><head><title>Order Summary</title>');
       win.document.write('</head><body>');
       win.document.write('<h3>Order Summary (' + formatDate(new Date()) + ')</h3>');
+      win.document.write('<p><strong>Stockist Name:</strong> ' + stockistName + '</p>');
+      win.document.write('<p><strong>Salesman Name:</strong> ' + salesmanName + '</p>');
       win.document.write(cartContent);
       win.document.write('</body></html>');
       win.document.close();
@@ -409,4 +417,3 @@
   </script>
 </body>
 </html>
-
