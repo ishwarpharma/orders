@@ -14,15 +14,22 @@
     }
 
     header {
-      text-align: center;
+      position: fixed; /* Fix header to top */
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between; /* Space between title and cart button */
+      align-items: center;
       padding: 10px;
       background-color: #007bff;
       color: white;
       font-size: 1.5rem;
+      z-index: 1000;
     }
 
     .container {
       padding: 15px; /* Increased padding for better spacing on mobile */
+      margin-top: 60px; /* Add margin to account for fixed header */
     }
 
     .search-bar {
@@ -43,6 +50,7 @@
       border-radius: 5px;
       margin-bottom: 15px;
       background-color: #fff;
+      cursor: pointer; /* Indicate clickable items */
     }
 
     .item:nth-child(even) {
@@ -91,10 +99,15 @@
       margin-top: 5px;
     }
 
+    .modal-content input.narrow {
+      width: 4ch; /* Width adjusted to fit 4 digits */
+    }
+
     .radio-group {
       display: flex;
       justify-content: space-between;
       margin-top: 10px;
+      gap: 5px; /* Reduced gap between radio buttons */
     }
 
     .radio-group label {
@@ -143,6 +156,17 @@
       color: #dc3545;
     }
 
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px; /* Add space between buttons */
+      margin-top: 10px; /* Add margin to separate from inputs */
+    }
+
+    .button-icon {
+      font-size: 1.5rem; /* Increase button icon size */
+    }
+
     @media (max-width: 600px) {
       header {
         font-size: 1.2rem; /* Smaller font size for header on mobile */
@@ -177,7 +201,10 @@
   </style>
 </head>
 <body>
-  <header>Ishwar Order System</header>
+  <header>
+    Ishwar Order System
+    <button onclick="viewCart()">Cart</button>
+  </header>
   <div class="container">
     <input type="text" id="search" class="search-bar" placeholder="Search items...">
     <div id="item-list"></div>
@@ -188,7 +215,7 @@
       <h3>Order Details</h3>
       <div id="selected-item-details"></div>
       <label for="order-qty">Order Quantity:</label>
-      <input type="number" id="order-qty" placeholder="Enter quantity..." inputmode="numeric">
+      <input type="number" id="order-qty" class="narrow" placeholder="0000" inputmode="numeric">
 
       <div class="radio-group">
         <label><input type="radio" name="unit" value="boxes"> Boxes</label>
@@ -196,15 +223,16 @@
       </div>
 
       <label for="special-rate">Special Rate:</label>
-      <input type="number" id="special-rate" placeholder="Enter special rate..." step="0.01" inputmode="decimal">
+      <input type="number" id="special-rate" class="narrow" placeholder="0000" step="0.01" inputmode="decimal">
 
-      <button onclick="addToCart()">Add to Cart</button>
-      <button onclick="closeModal()">Cancel</button>
+      <div class="buttons">
+        <button class="button-icon" onclick="addToCart()">Add to Cart</button>
+        <button class="button-icon" onclick="closeModal()">Cancel</button>
+      </div>
     </div>
   </div>
 
   <div class="container">
-    <button onclick="viewCart()">View Cart</button>
     <div id="cart-summary" class="summary" style="display: none;">
       <h3>Order Summary</h3>
       <table>
@@ -235,51 +263,51 @@
         displayItems(data);
       });
 
-    // Display items
-    function displayItems(items) {
-      const itemList = document.getElementById('item-list');
-      itemList.innerHTML = '';
-      items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <div class="item-details">
-            <strong>${item['Product Name']}</strong><br>
-            <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
-            <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
-            <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
-          </div>
-          <button onclick="selectItem(${item['Sl']})">Select</button>
-        `;
-        itemList.appendChild(div);
-      });
-    }
-
-    // Search functionality
-    document.getElementById('search').addEventListener('input', function() {
-      const query = this.value.toLowerCase();
-      const filteredData = data.filter(item =>
-        item['Product Name'].toLowerCase().includes(query)
-      );
-      displayItems(filteredData);
-    });
-
-    // Select item
-    function selectItem(sl) {
-      const item = data.find(i => i['Sl'] === sl);
-      document.getElementById('selected-item-details').innerHTML = `
-        <strong>${item['Product Name']}</strong><br>
-        <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
-        <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
-        <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
+      // Display items
+  function displayItems(items) {
+    const itemList = document.getElementById('item-list');
+    itemList.innerHTML = '';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div class="item-details">
+          <strong>${item['Product Name']}</strong><br>
+          <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
+          <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
+          <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
+        </div>
       `;
-      document.getElementById('order-qty').value = '';
-      document.getElementById('special-rate').value = '';
-      document.querySelector('input[name="unit"][value="boxes"]').checked = true;
-      document.getElementById('modal').style.display = 'flex';
-    }
+      div.addEventListener('click', () => selectItem(item['Sl']));
+      itemList.appendChild(div);
+    });
+  }
 
-    // Add to cart
+  // Search functionality
+  document.getElementById('search').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const filteredData = data.filter(item =>
+      item['Product Name'].toLowerCase().includes(query)
+    );
+    displayItems(filteredData);
+  });
+
+  // Select item
+  function selectItem(sl) {
+    const item = data.find(i => i['Sl'] === sl);
+    document.getElementById('selected-item-details').innerHTML = `
+      <strong>${item['Product Name']}</strong><br>
+      <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
+      <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
+      <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
+    `;
+    document.getElementById('order-qty').value = '';
+    document.getElementById('special-rate').value = '';
+    document.querySelector('input[name="unit"][value="boxes"]').checked = true;
+    document.getElementById('modal').style.display = 'flex';
+  }
+
+  // Add to cart
   function addToCart() {
     const qty = parseFloat(document.getElementById('order-qty').value) || 0;
     const rate = parseFloat(document.getElementById('special-rate').value) || 0;
@@ -310,6 +338,6 @@
     });
     document.getElementById('cart-summary').style.display = 'block';
   }
-</script>
+  </script>
 </body>
 </html>
