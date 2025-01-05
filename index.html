@@ -18,7 +18,6 @@
       top: 0;
       width: 100%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 10px;
       background-color: #007bff;
@@ -27,17 +26,24 @@
       z-index: 1000;
     }
 
-    header button {
+    .header-buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-buttons button {
       background-color: #28a745;
       color: white;
       border: none;
       padding: 10px;
       cursor: pointer;
       font-size: 1rem;
+      margin-right: 10px; /* Add space between buttons */
     }
 
-    header button:last-child {
+    .header-buttons button:last-child {
       background-color: #ff5733;
+      margin-right: 0; /* Remove margin from the last button */
     }
 
     .container {
@@ -222,9 +228,11 @@
 </head>
 <body>
   <header>
-    <button onclick="newOrder()" style="background-color: #28a745;">New Order</button>
-    Ishwar Pharma
-    <button onclick="viewCart()" style="background-color: #ff5733;">Cart</button>
+    <div class="header-buttons">
+      <button onclick="newOrder()">New Order</button>
+      Ishwar Pharma
+      <button onclick="viewCart()">Cart</button>
+    </div>
   </header>
   <div class="container">
     <input type="text" id="search" class="search-bar" placeholder="Search items...">
@@ -254,14 +262,10 @@
 
   <div id="cart-modal" class="cart-modal">
     <div class="cart-modal-content">
-      <h3>Order Summary</h3>
+      <h3>Order Summary (${new Date().toISOString().substring(0, 10)})</h3>
       <div class="form-group">
         <label for="stockist-name">Stockist Name:</label>
         <input type="text" id="stockist-name" placeholder="Enter stockist name...">
-      </div>
-      <div class="form-group">
-        <label for="order-date">Order Date:</label>
-        <input type="date" id="order-date" value="${new Date().toISOString().substring(0, 10)}">
       </div>
       <div class="form-group">
         <label for="salesman-name">Salesman Name:</label>
@@ -287,7 +291,7 @@
         displayItems(json);
       });
 
-     // Display items
+      // Display items
     function displayItems(items) {
       const itemList = document.getElementById('item-list');
       itemList.innerHTML = '';
