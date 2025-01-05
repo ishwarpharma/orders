@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f9ff; /* Light refreshing color */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 10px;
+            background-color: #007acc; /* Blue header */
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .record-count {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .item-search {
+            margin-bottom: 15px;
+        }
+
+        .item-search input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007acc;
+            color: white;
+        }
+
+        .order-quantity {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle {
+            margin-left: 10px;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e0ffe0; /* Light green */
+            border-radius: 5px;
+            display: none;
+        }
+
+        .summary h3 {
+            margin-top: 0;
+            color: #007acc;
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #007acc;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+            }
+
+            .input-row input {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Order Management System</header>
+    <div class="container">
+        <div class="record-count">Total Records Loaded: <span id="record-count">0</span></div>
+        <div class="item-search">
+            <input type="text" id="search" placeholder="Search items...">
+        </div>
+        <div class="input-row">
+            <input type="text" id="stockist-name" placeholder="Stockist Name">
+            <input type="date" id="order-date">
+            <input type="text" id="salesman-name" placeholder="Salesman Name">
+        </div>
+        <table id="item-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>MRP</th>
+                    <th>Rates</th>
+                    <th>Case Size</th>
+                    <th>Order Quantity</th>
+                    <th>Unit</th>
+                    <th>Special Rates</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Items will be dynamically loaded here -->
+            </tbody>
+        </table>
+        <div class="summary" id="summary">
+            <h3>Order Summary</h3>
+            <p>Stockist Name: <span id="summary-stockist-name"></span></p>
+            <p>Date of Order: <span id="summary-order-date"></span></p>
+            <p>Salesman Name: <span id="summary-salesman-name"></span></p>
+            <table id="summary-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Order Quantity</th>
+                        <th>Unit</th>
+                        <th>Rates</th>
+                        <th>Special Rates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Summary items will be dynamically loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <button class="btn" id="checkout">Checkout</button>
+    </div>
+    <footer>&copy; 2025 Order Management System</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const recordCountElement = document.getElementById('record-count');
+            const searchInput = document.getElementById('search');
+            const itemTableBody = document.querySelector('#item-table tbody');
+            const checkoutButton = document.getElementById('checkout');
+            const summaryElement = document.getElementById('summary');
+            const summaryStockistName = document.getElementById('summary-stockist-name');
+            const summaryOrderDate = document.getElementById('summary-order-date');
+            const summarySalesmanName = document.getElementById('summary-salesman-name');
+            const summaryTableBody = document.querySelector('#summary-table tbody');
+            const stockistNameInput = document.getElementById('stockist-name');
+            const orderDateInput = document.getElementById('order-date');
+            const salesmanNameInput = document.getElementById('salesman-name');
+
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            orderDateInput.value = today;
+
+            // Load JSON data
+            fetch('glenmark.json')
+                .then(response => response.json())
+                .then(data => {
+                    let recordCount = 0;
+
+                    data.forEach(item => {
+                        recordCount++;
+                        const row = document.createElement('tr');
+
+                        const productNameCell = document.createElement('td');
+                        productNameCell.textContent = item["Product Name"] || "Unknown Product";
+
+                        const mrpCell = document.createElement('td');
+                        mrpCell.textContent = `Rs. ${item.MRP || "N/A"}`;
+
+                        const ratesCell = document.createElement('td');
+                        ratesCell.textContent = item["Rates"] || "N/A";
+
+                        const caseSizeCell = document.createElement('td');
+                        caseSizeCell.textContent = item["Case Size"] || "N/A";
+
+                        const quantityCell = document.createElement('td');
+                        const quantityInput = document.createElement('input');
+                        quantityInput.type = 'number';
+                        quantityInput.placeholder = 'Enter Quantity';
+                        quantityInput.className = 'quantity-input';
+
+                        const toggleWrapper = document.createElement('div');
+                        toggleWrapper.className = 'order-quantity';
+
+                        const toggle = document.createElement('select');
+                        toggle.className = 'toggle';
+                        const boxOption = document.createElement('option');
+                        boxOption.value = 'Box';
+                        boxOption.textContent = 'Box';
+
+                        const caseOption = document.createElement('option');
+                        caseOption.value = 'Case';
+                        caseOption.textContent = 'Case';
+
+                        toggle.appendChild(boxOption);
+                        toggle.appendChild(caseOption);
+
+                        toggleWrapper.appendChild(quantityInput);
+                        toggleWrapper.appendChild(toggle);
+                        quantityCell.appendChild(toggleWrapper);
+
+                        const unitCell = document.createElement('td');
+                        unitCell.textContent = item["Box"] || "N/A";
+
+                        const specialRatesCell = document.createElement('td');
+                        const specialRatesInput = document.createElement('input');
+                        specialRatesInput.type = 'text';
+                        specialRatesInput.placeholder = 'Special Rates';
+                        specialRatesCell.appendChild(specialRatesInput);
+
+                        row.appendChild(productNameCell);
+                        row.appendChild(mrpCell);
+                        row.appendChild(ratesCell);
+                        row.appendChild(caseSizeCell);
+                        row.appendChild(quantityCell);
+                        row.appendChild(unitCell);
+                        row.appendChild(specialRatesCell);
+
+                        itemTableBody.appendChild(row);
+                    });
+
+                    recordCountElement.textContent = recordCount;
+                    checkoutButton.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading JSON data:', error);
+                });
+
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                const searchValue = searchInput.value.toLowerCase();
+                const rows = itemTableBody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    const productName = row.cells[0].textContent.toLowerCase();
+                    row.style.display = productName.includes(searchValue) ? '' : 'none';
+                });
+            });
+
+           [_{{{CITATION{{{_1{](https://github.com/muhammadfahrul/php-orm/tree/3de930cac5a0da72b06f477a04ef9465479d46e2/App%2FViews%2Forder%2Findex.php)
