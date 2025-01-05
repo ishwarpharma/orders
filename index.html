@@ -134,15 +134,21 @@
 
     .radio-group {
       display: flex;
-      align-items: center;
-      gap: 5px;
+      flex-direction: column; /* Arrange options in columns */
+      align-items: flex-start;
       margin-top: 10px;
     }
 
-    .radio-group label {
+    .radio-group-inner {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+
+    .radio-group-inner label {
       display: flex;
       align-items: center;
-      margin-right: 15px; /* Adds spacing between options */
     }
 
     .buttons {
@@ -235,10 +241,12 @@
       <input type="number" id="order-qty" class="narrow" placeholder="000000" inputmode="numeric">
       
       <div class="radio-group">
-        <label><input type="radio" name="unit" value="strips"> Strips</label>
-        <label><input type="radio" name="unit" value="pcs"> Pcs</label>
-        <label><input type="radio" name="unit" value="boxes" checked> Boxes</label>
-        <label><input type="radio" name="unit" value="cases"> Cases</label>
+        <div class="radio-group-inner">
+          <label><input type="radio" name="unit" value="strips"> Strips</label>
+          <label><input type="radio" name="unit" value="pcs"> Pcs</label>
+          <label><input type="radio" name="unit" value="boxes" checked> Boxes</label>
+          <label><input type="radio" name="unit" value="cases"> Cases</label>
+        </div>
       </div>
 
       <label for="special-rate">Special Rate:</label>
@@ -282,7 +290,7 @@
         displayItems(json);
       });
 
-    // Display items
+       // Display items
     function displayItems(items) {
       const itemList = document.getElementById('item-list');
       itemList.innerHTML = '';
@@ -302,7 +310,7 @@
       });
     }
 
-       // Search functionality
+    // Search functionality
     document.getElementById('search').addEventListener('input', function() {
       const query = this.value.toLowerCase();
       const filteredData = data.filter(item =>
