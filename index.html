@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishwar Pharma</title>
+  <title>Ishwar Order System</title>
   <style>
     body {
       font-family: Calibri, sans-serif;
@@ -29,6 +29,7 @@
     .header-buttons {
       display: flex;
       align-items: center;
+      gap: 10px;
     }
 
     .header-buttons button {
@@ -38,12 +39,10 @@
       padding: 10px;
       cursor: pointer;
       font-size: 1rem;
-      margin-right: 10px; /* Add space between buttons */
     }
 
     .header-buttons button:last-child {
       background-color: #ff5733;
-      margin-right: 0; /* Remove margin from the last button */
     }
 
     .container {
@@ -92,7 +91,7 @@
     }
 
     .color-pts {
-      color: black;
+      color: red; /* Change PTS and its values to Red */
     }
 
     .modal, .cart-modal {
@@ -101,7 +100,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: 100%; /* Make the popup full screen */
       background: rgba(0, 0, 0, 0.5);
       justify-content: center;
       align-items: center;
@@ -111,8 +110,8 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      width: 95%;
-      max-width: 400px;
+      width: 100%; /* Full screen width */
+      height: 100%; /* Full screen height */
     }
 
     .modal-content label, .cart-modal-content label {
@@ -230,7 +229,7 @@
   <header>
     <div class="header-buttons">
       <button onclick="newOrder()">New Order</button>
-      Ishwar Pharma
+      Ishwar Order System
       <button onclick="viewCart()">Cart</button>
     </div>
   </header>
@@ -262,7 +261,7 @@
 
   <div id="cart-modal" class="cart-modal">
     <div class="cart-modal-content">
-      <h3>Order Summary (${new Date().toISOString().substring(0, 10)})</h3>
+      <h3>Order Summary (${formatDate(new Date())})</h3>
       <div class="form-group">
         <label for="stockist-name">Stockist Name:</label>
         <input type="text" id="stockist-name" placeholder="Enter stockist name...">
@@ -291,7 +290,7 @@
         displayItems(json);
       });
 
-      // Display items
+        // Display items
     function displayItems(items) {
       const itemList = document.getElementById('item-list');
       itemList.innerHTML = '';
@@ -377,6 +376,8 @@
     // New order
     function newOrder() {
       cart = [];
+      document.getElementById('stockist-name').value = '';
+      document.getElementById('salesman-name').value = '';
       closeCart();
       alert("New order started. Cart cleared.");
     }
@@ -387,12 +388,22 @@
       const win = window.open('', '', 'height=700,width=700');
       win.document.write('<html><head><title>Order Summary</title>');
       win.document.write('</head><body>');
-      win.document.write('<h3>Order Summary (' + new Date().toISOString().substring(0, 10) + ')</h3>');
+      win.document.write('<h3>Order Summary (' + formatDate(new Date()) + ')</h3>');
       win.document.write(cartContent);
       win.document.write('</body></html>');
       win.document.close();
       win.print();
     }
+
+    // Format date to Indian format
+    function formatDate(date) {
+      const options = { day: '2-digit', month: 'long', year: 'numeric' };
+      return date.toLocaleDateString('en-IN', options);
+    }
+
+    // Initialize today's date in Indian format
+    document.querySelector('.cart-modal h3').innerHTML = `Order Summary (${formatDate(new Date())})`;
+
   </script>
 </body>
 </html>
