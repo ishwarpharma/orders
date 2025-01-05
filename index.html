@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishwar Order System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        .search-bar {
+            margin-bottom: 10px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .item-list {
+            margin-top: 10px;
+        }
+
+        .item {
+            background: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .item h3 {
+            margin: 0 0 5px;
+        }
+
+        .item button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .item button:hover {
+            background-color: #45a049;
+        }
+
+        .cart-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .cart-button button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .cart-button button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <header>Ishwar Order System</header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search products...">
+        </div>
+
+        <div class="item-list" id="item-list">
+            <!-- Item templates will be injected here -->
+        </div>
+
+        <div class="cart-button">
+            <button id="checkout">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // Embed the JSON data directly
+        const items = [
+            { "Sl": 1, "Product Name": "ARTIFLEX COLD & FLU Tablets [Blister]", "Pack": "10's\nBlister", "Box": "20x10", "Shipper": 50, "MRP": 80, "PTS": 15 },
+            { "Sl": 2, "Product Name": "ARTIFLEX PLUS Tablets [Alu Alu]", "Pack": "10's\nAlu Alu", "Box": "20x10", "Shipper": 50, "MRP": 99, "PTS": 8 },
+            { "Sl": 3, "Product Name": "ARTIFLEX PLUS Tablets [Blister]", "Pack": "10's\nBlister", "Box": "20x10", "Shipper": 50, "MRP": 99, "PTS": 6 },
+            { "Sl": 4, "Product Name": "ARTIFLEX TH-8 Tablets", "Pack": "10's\nAlu Alu\nMono Carton", "Box": "10x1x10", "Shipper": 30, "MRP": 450, "PTS": 62 },
+            { "Sl": 5, "Product Name": "ARTIFLEX-MR Tablets [Alu Alu]", "Pack": "10's\nAlu Alu", "Box": "20x10", "Shipper": 50, "MRP": 125, "PTS": 15 },
+        ];
+
+        const itemList = document.getElementById('item-list');
+
+        function renderItems(filteredItems) {
+            itemList.innerHTML = '';
+            filteredItems.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('item');
+                div.innerHTML = `
+                    <h3>${item["Product Name"]}</h3>
+                    <p><strong>Pack:</strong> ${item["Pack"]}</p>
+                    <p><strong>MRP:</strong> ₹${item["MRP"]}</p>
+                    <p><strong>PTS:</strong> ₹${item["PTS"]}</p>
+                    <button onclick="addToCart(${item["Sl"]})">Place Order</button>
+                `;
+                itemList.appendChild(div);
+            });
+        }
+
+        document.getElementById('search').addEventListener('input', function (e) {
+            const searchValue = e.target.value.toLowerCase();
+            const filteredItems = items.filter(item => item["Product Name"].toLowerCase().includes(searchValue));
+            renderItems(filteredItems);
+        });
+
+        function addToCart(itemId) {
+            alert(`Item ${itemId} added to cart!`);
+        }
+
+        document.getElementById('checkout').addEventListener('click', function () {
+            alert('Proceed to checkout!');
+        });
+
+        // Initial render
+        renderItems(items);
+    </script>
+</body>
+</html>
