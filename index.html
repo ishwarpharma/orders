@@ -21,7 +21,7 @@
       justify-content: space-between; /* Space between title and buttons */
       align-items: center;
       padding: 10px;
-      background-color: #d4edda; /* Light green background */
+      background-color: #007bff; /* Blue background */
       color: white;
       font-size: 1.5rem;
       z-index: 1000;
@@ -145,13 +145,11 @@
     }
 
     .cart-item-details {
-      margin-bottom: 10px;
-      color: red; /* Red color for item details in the cart */
+      color: black; /* Black color for item details in the cart */
     }
 
-    .cart-item .label {
-      font-weight: bold;
-      margin-right: 5px;
+    .cart-item .qty {
+      color: red; /* Red color for Order Qty */
     }
 
     .buttons {
@@ -251,14 +249,10 @@
 
   <div id="cart-modal" class="cart-modal">
     <div class="cart-modal-content">
-      <h3>Order Summary</h3>
+      <h3>Order Summary (${new Date().toISOString().substring(0, 10)})</h3>
       <div class="form-group">
         <label for="stockist-name">Stockist Name:</label>
         <input type="text" id="stockist-name" placeholder="Enter stockist name...">
-      </div>
-      <div class="form-group">
-        <label for="order-date">Order Date:</label>
-        <input type="text" id="order-date" value="${new Date().toISOString().substring(0, 10)}" readonly>
       </div>
       <div class="form-group">
         <label for="salesman-name">Salesman Name:</label>
@@ -266,13 +260,15 @@
       </div>
       <div id="cart-items"></div>
       <div class="buttons">
-        <button class="button-icon" onclick="closeCart()">Close</button>
-        <button class="button-icon" onclick="exportToPDF()">Export to PDF</button>
+        <button class="button-icon" onclick="closeCart()" style="background-color: #6c757d;">Close</button>
+        <button class="button-icon" onclick="exportToPDF()" style="background-color: #007bff;">Export to PDF</button>
+        <button class="button-icon" onclick="takeScreenshot()" style="background-color: #17a2b8;">Screenshot</button>
       </div>
     </div>
   </div>
 
   <script>
+
     let data = [];
     let cart = [];
 
@@ -281,7 +277,7 @@
       .then(response => response.json())
       .then(json => {
         data = json;
-        displayItems(data);
+        displayItems(json);
       });
 
     // Display items
@@ -349,12 +345,12 @@
       cartItems.innerHTML = '';
       cart.forEach((item, index) => {
         const { itemDetails, qty, rate, unit } = item;
+        const rateDisplay = rate ? `, Special Rate: ₹${rate.toFixed(2)}` : '';
         const div = document.createElement('div');
         div.className = 'cart-item';
-        const rateDisplay = rate ? `<div><span class="label">Special Rate:</span> ₹${rate.toFixed(2)}</div>` : '';
         div.innerHTML = `
           <div class="cart-item-details">
-            ${index + 1}. ${itemDetails} - Qty: ${qty} ${unit}${rate ? ', ' + rateDisplay : ''}
+            ${index + 1}. ${itemDetails} - <span class="qty">Qty: ${qty}</span> ${unit}${rateDisplay}
           </div>
         `;
         cartItems.appendChild(div);
@@ -376,15 +372,27 @@
 
     // Export to PDF
     function exportToPDF() {
-      const cartContent = document.getElementById('cart-modal').innerHTML;
+      const cartContent = document.getElementById('cart-items').innerHTML;
       const win = window.open('', '', 'height=700,width=700');
       win.document.write('<html><head><title>Order Summary</title>');
-      win.document.write('</head><body >');
+      win.document.write('</head><body>');
+      win.document.write('<h3>Order Summary (' + new Date().toISOString().substring(0, 10) + ')</h3>');
       win.document.write(cartContent);
       win.document.write('</body></html>');
       win.document.close();
       win.print();
     }
+
+    // Take screenshot
+    function takeScreenshot() {
+      html2canvas(document.querySelector(".cart-modal-content")).then(canvas => {
+        let link = document.createElement('a');
+        link.download = 'order-summary.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </body>
 </html>
