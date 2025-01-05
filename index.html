@@ -269,7 +269,7 @@
         displayItems(data);
       });
 
-         // Display items
+        // Display items
       function displayItems(items) {
         const itemList = document.getElementById('item-list');
         itemList.innerHTML = '';
@@ -344,7 +344,6 @@
           `;
           cartItems.appendChild(div);
         });
-        document.getElementById('cart-summary').style.display = 'block';
         document.getElementById('cart-modal').style.display = 'flex';
       }
 
@@ -359,6 +358,6 @@
         closeCart();
         alert("New order started. Cart cleared.");
       }
-    </script>
+  </script>
 </body>
 </html>
