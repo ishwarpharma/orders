@@ -18,7 +18,7 @@
       top: 0;
       width: 100%;
       display: flex;
-      justify-content: space-between; /* Space between title and cart button */
+      justify-content: space-between; /* Space between title and buttons */
       align-items: center;
       padding: 10px;
       background-color: #007bff;
@@ -67,7 +67,7 @@
       font-weight: bold;
     }
 
-    .modal {
+    .modal, .cart-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -79,7 +79,7 @@
       align-items: center;
     }
 
-    .modal-content {
+    .modal-content, .cart-modal-content {
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -87,19 +87,19 @@
       max-width: 400px;
     }
 
-    .modal-content label {
+    .modal-content label, .cart-modal-content label {
       display: block;
       margin-top: 10px;
     }
 
-    .modal-content input {
+    .modal-content input, .cart-modal-content input {
       width: 100%;
       padding: 8px; /* Slightly increased padding for better touch targets */
       font-size: 1rem; /* Larger font size for better readability */
       margin-top: 5px;
     }
 
-    .modal-content input.narrow {
+    .modal-content input.narrow, .cart-modal-content input.narrow {
       width: 4ch; /* Width adjusted to fit 4 digits */
     }
 
@@ -187,11 +187,11 @@
         padding: 10px; /* Adjust padding for mobile */
       }
 
-      .modal-content {
+      .modal-content, .cart-modal-content {
         width: 90%; /* Adjust width for smaller screens */
       }
 
-      .modal-content input {
+      .modal-content input, .cart-modal-content input {
         padding: 6px; /* Adjust padding for mobile */
         font-size: 0.9rem; /* Adjust font size for mobile */
       }
@@ -204,6 +204,7 @@
 </head>
 <body>
   <header>
+    <button onclick="newOrder()">New Order</button>
     Ishwar Order System
     <button onclick="viewCart()">Cart</button>
   </header>
@@ -234,9 +235,8 @@
     </div>
   </div>
 
-  <div class="container">
-    <button onclick="viewCart()">View Cart</button>
-    <div id="cart-summary" class="summary" style="display: none;">
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-modal-content">
       <h3>Order Summary</h3>
       <div class="form-group">
         <label for="stockist-name">Stockist Name:</label>
@@ -244,13 +244,16 @@
       </div>
       <div class="form-group">
         <label for="order-date">Order Date:</label>
-        <input type="date" id="order-date">
+        <input type="date" id="order-date" value="${new Date().toISOString().substring(0, 10)}">
       </div>
       <div class="form-group">
         <label for="salesman-name">Salesman Name:</label>
         <input type="text" id="salesman-name" placeholder="Enter salesman name...">
       </div>
       <div id="cart-items"></div>
+      <div class="buttons">
+        <button class="button-icon" onclick="closeCart()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -266,7 +269,7 @@
         displayItems(data);
       });
 
-        // Display items
+         // Display items
       function displayItems(items) {
         const itemList = document.getElementById('item-list');
         itemList.innerHTML = '';
@@ -342,7 +345,20 @@
           cartItems.appendChild(div);
         });
         document.getElementById('cart-summary').style.display = 'block';
+        document.getElementById('cart-modal').style.display = 'flex';
       }
-  </script>
+
+      // Close cart
+      function closeCart() {
+        document.getElementById('cart-modal').style.display = 'none';
+      }
+
+      // New order
+      function newOrder() {
+        cart = [];
+        closeCart();
+        alert("New order started. Cart cleared.");
+      }
+    </script>
 </body>
 </html>
