@@ -123,37 +123,21 @@
       margin-top: 20px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 1rem; /* Larger font size for better readability */
-    }
-
-    table th, table td {
+    .cart-item {
+      background-color: #fff;
+      padding: 10px;
       border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
+      border-radius: 5px;
+      margin-bottom: 10px;
     }
 
-    table th {
-      background-color: #007bff;
-      color: white;
+    .cart-item-details {
+      margin-bottom: 10px;
     }
 
-    .color-mrp {
-      color: #28a745;
-    }
-
-    .color-pts {
-      color: #17a2b8;
-    }
-
-    .color-qty {
-      color: #ffc107;
-    }
-
-    .color-rate {
-      color: #dc3545;
+    .cart-item .label {
+      font-weight: bold;
+      margin-right: 5px;
     }
 
     .buttons {
@@ -165,6 +149,24 @@
 
     .button-icon {
       font-size: 1.5rem; /* Increase button icon size */
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      display: block;
+    }
+
+    .form-group input {
+      width: calc(100% - 10px);
+      padding: 8px;
+      font-size: 1rem;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     @media (max-width: 600px) {
@@ -233,21 +235,22 @@
   </div>
 
   <div class="container">
+    <button onclick="viewCart()">View Cart</button>
     <div id="cart-summary" class="summary" style="display: none;">
       <h3>Order Summary</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Pack</th>
-            <th>Shipper</th>
-            <th class="color-pts">PTS</th>
-            <th class="color-qty">Order Qty</th>
-            <th class="color-rate">Special Rates</th>
-          </tr>
-        </thead>
-        <tbody id="summary-table"></tbody>
-      </table>
+      <div class="form-group">
+        <label for="stockist-name">Stockist Name:</label>
+        <input type="text" id="stockist-name" placeholder="Enter stockist name...">
+      </div>
+      <div class="form-group">
+        <label for="order-date">Order Date:</label>
+        <input type="date" id="order-date">
+      </div>
+      <div class="form-group">
+        <label for="salesman-name">Salesman Name:</label>
+        <input type="text" id="salesman-name" placeholder="Enter salesman name...">
+      </div>
+      <div id="cart-items"></div>
     </div>
   </div>
 
@@ -263,81 +266,83 @@
         displayItems(data);
       });
 
-      // Display items
-  function displayItems(items) {
-    const itemList = document.getElementById('item-list');
-    itemList.innerHTML = '';
-    items.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML = `
-        <div class="item-details">
+        // Display items
+      function displayItems(items) {
+        const itemList = document.getElementById('item-list');
+        itemList.innerHTML = '';
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <div class="item-details">
+              <strong>${item['Product Name']}</strong><br>
+              <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
+              <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
+              <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
+            </div>
+          `;
+          div.addEventListener('click', () => selectItem(item['Sl']));
+          itemList.appendChild(div);
+        });
+      }
+
+      // Search functionality
+      document.getElementById('search').addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        const filteredData = data.filter(item =>
+          item['Product Name'].toLowerCase().includes(query)
+        );
+        displayItems(filteredData);
+      });
+
+      // Select item
+      function selectItem(sl) {
+        const item = data.find(i => i['Sl'] === sl);
+        document.getElementById('selected-item-details').innerHTML = `
           <strong>${item['Product Name']}</strong><br>
           <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
           <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
           <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
-        </div>
-      `;
-      div.addEventListener('click', () => selectItem(item['Sl']));
-      itemList.appendChild(div);
-    });
-  }
+        `;
+        document.getElementById('order-qty').value = '';
+        document.getElementById('special-rate').value = '';
+        document.querySelector('input[name="unit"][value="boxes"]').checked = true;
+        document.getElementById('modal').style.display = 'flex';
+      }
 
-  // Search functionality
-  document.getElementById('search').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const filteredData = data.filter(item =>
-      item['Product Name'].toLowerCase().includes(query)
-    );
-    displayItems(filteredData);
-  });
+      // Add to cart
+      function addToCart() {
+        const qty = parseFloat(document.getElementById('order-qty').value) || 0;
+        const rate = parseFloat(document.getElementById('special-rate').value) || 0;
+        const unit = document.querySelector('input[name="unit"]:checked').value;
+        const itemDetails = document.getElementById('selected-item-details').innerHTML;
+        cart.push({ itemDetails, qty, rate, unit });
+        closeModal();
+      }
 
-  // Select item
-  function selectItem(sl) {
-    const item = data.find(i => i['Sl'] === sl);
-    document.getElementById('selected-item-details').innerHTML = `
-      <strong>${item['Product Name']}</strong><br>
-      <span>${item['Pack']}, ${item['Box']}, Shipper: ${item['Shipper']}</span><br>
-      <span class="color-mrp">MRP: ₹${parseFloat(item['MRP']).toFixed(2)}</span>,
-      <span class="color-pts">PTS: ₹${parseFloat(item['PTS']).toFixed(2)}</span>
-    `;
-    document.getElementById('order-qty').value = '';
-    document.getElementById('special-rate').value = '';
-    document.querySelector('input[name="unit"][value="boxes"]').checked = true;
-    document.getElementById('modal').style.display = 'flex';
-  }
+      // Close modal
+      function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+      }
 
-  // Add to cart
-  function addToCart() {
-    const qty = parseFloat(document.getElementById('order-qty').value) || 0;
-    const rate = parseFloat(document.getElementById('special-rate').value) || 0;
-    const unit = document.querySelector('input[name="unit"]:checked').value;
-    const itemDetails = document.getElementById('selected-item-details').innerHTML;
-    cart.push({ itemDetails, qty, rate, unit });
-    closeModal();
-  }
-
-  // Close modal
-  function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-  }
-
-  // View cart
-  function viewCart() {
-    const table = document.getElementById('summary-table');
-    table.innerHTML = '';
-    cart.forEach(({ itemDetails, qty, rate, unit }) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${itemDetails}</td>
-        <td>${unit}</td>
-        <td>${qty}</td>
-        <td>₹${rate.toFixed(2)}</td>
-      `;
-      table.appendChild(row);
-    });
-    document.getElementById('cart-summary').style.display = 'block';
-  }
+      // View cart
+      function viewCart() {
+        const cartItems = document.getElementById('cart-items');
+        cartItems.innerHTML = '';
+        cart.forEach(({ itemDetails, qty, rate, unit }) => {
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <div class="cart-item-details">
+              ${itemDetails}
+              <div><span class="label">Quantity:</span> ${qty} ${unit}</div>
+              <div><span class="label">Special Rate:</span> ₹${rate.toFixed(2)}</div>
+            </div>
+          `;
+          cartItems.appendChild(div);
+        });
+        document.getElementById('cart-summary').style.display = 'block';
+      }
   </script>
 </body>
 </html>
