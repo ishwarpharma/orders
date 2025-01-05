@@ -3,32 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ishwar Order System</title>
+  <title>Ishwar Pharma</title>
   <style>
     body {
       font-family: Calibri, sans-serif;
-      font-size: 14px; /* Increased base font size for better readability on mobile */
+      font-size: 14px;
       margin: 0;
       padding: 0;
       background-color: #f4f4f9;
     }
 
     header {
-      position: fixed; /* Fix header to top */
+      position: fixed;
       top: 0;
       width: 100%;
       display: flex;
-      justify-content: space-between; /* Space between title and buttons */
+      justify-content: space-between;
       align-items: center;
       padding: 10px;
-      background-color: #007bff; /* Blue background */
+      background-color: #007bff;
       color: white;
       font-size: 1.5rem;
       z-index: 1000;
     }
 
     header button {
-      background-color: #28a745; /* Green for New Order */
+      background-color: #28a745;
       color: white;
       border: none;
       padding: 10px;
@@ -37,33 +37,38 @@
     }
 
     header button:last-child {
-      background-color: #ff5733; /* Red for Cart */
+      background-color: #ff5733;
     }
 
     .container {
-      padding: 15px; /* Increased padding for better spacing on mobile */
-      margin-top: 60px; /* Add margin to account for fixed header */
+      padding: 15px;
+      margin-top: 60px;
     }
 
     .search-bar {
       width: 100%;
-      padding: 12px; /* Slightly increased padding for easier tapping */
+      padding: 12px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 5px;
-      font-size: 1rem; /* Larger font size for better readability */
+      font-size: 1rem;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 60px;
+      background-color: #f4f4f9;
+      z-index: 1000;
     }
 
     .item {
       display: flex;
-      flex-direction: column; /* Stack items vertically on mobile */
+      flex-direction: column;
       justify-content: space-between;
-      align-items: flex-start; /* Align items to start for better flow on mobile */
-      padding: 12px; /* Slightly increased padding for better touch targets */
+      align-items: flex-start;
+      padding: 12px;
       border-radius: 5px;
       margin-bottom: 15px;
       background-color: #fff;
-      cursor: pointer; /* Indicate clickable items */
+      cursor: pointer;
     }
 
     .item:nth-child(even) {
@@ -72,7 +77,7 @@
 
     .item-details {
       flex: 1;
-      margin-bottom: 10px; /* Added margin for better spacing between elements */
+      margin-bottom: 10px;
     }
 
     .highlight {
@@ -81,7 +86,7 @@
     }
 
     .color-pts {
-      color: red; /* Red color for PTS */
+      color: black;
     }
 
     .modal, .cart-modal {
@@ -100,7 +105,7 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      width: 95%; /* Increased width for better use of screen space */
+      width: 95%;
       max-width: 400px;
     }
 
@@ -111,20 +116,20 @@
 
     .modal-content input, .cart-modal-content input {
       width: 100%;
-      padding: 8px; /* Slightly increased padding for better touch targets */
-      font-size: 1rem; /* Larger font size for better readability */
+      padding: 8px;
+      font-size: 1rem;
       margin-top: 5px;
     }
 
     .modal-content input.narrow, .cart-modal-content input.narrow {
-      width: 4ch; /* Width adjusted to fit 4 digits */
+      width: 6ch;
     }
 
     .radio-group {
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
       margin-top: 10px;
-      gap: 5px; /* Reduced gap between radio buttons */
     }
 
     .radio-group label {
@@ -145,22 +150,23 @@
     }
 
     .cart-item-details {
-      color: black; /* Black color for item details in the cart */
+      color: black;
     }
 
-    .cart-item .qty {
-      color: red; /* Red color for Order Qty */
+    .cart-item .qty, .cart-item .unit {
+      color: red;
     }
 
     .buttons {
       display: flex;
       justify-content: space-between;
-      gap: 10px; /* Add space between buttons */
-      margin-top: 10px; /* Add margin to separate from inputs */
+      gap: 10px;
+      margin-top: 10px;
     }
 
     .button-icon {
-      font-size: 1.5rem; /* Increase button icon size */
+      font-size: 1rem;
+      padding: 5px;
     }
 
     .form-group {
@@ -183,33 +189,33 @@
 
     @media (max-width: 600px) {
       header {
-        font-size: 1.2rem; /* Smaller font size for header on mobile */
+        font-size: 1.2rem;
       }
 
       .container {
-        padding: 10px; /* Adjust padding for mobile */
+        padding: 10px;
       }
 
       .search-bar {
-        padding: 10px; /* Adjust padding for mobile */
-        font-size: 0.9rem; /* Adjust font size for mobile */
+        padding: 10px;
+        font-size: 0.9rem;
       }
 
       .item {
-        padding: 10px; /* Adjust padding for mobile */
+        padding: 10px;
       }
 
       .modal-content, .cart-modal-content {
-        width: 90%; /* Adjust width for smaller screens */
+        width: 90%;
       }
 
       .modal-content input, .cart-modal-content input {
-        padding: 6px; /* Adjust padding for mobile */
-        font-size: 0.9rem; /* Adjust font size for mobile */
+        padding: 6px;
+        font-size: 0.9rem;
       }
 
       table {
-        font-size: 0.9rem; /* Adjust font size for mobile */
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -217,7 +223,7 @@
 <body>
   <header>
     <button onclick="newOrder()" style="background-color: #28a745;">New Order</button>
-    Ishwar Order System
+    Ishwar Pharma
     <button onclick="viewCart()" style="background-color: #ff5733;">Cart</button>
   </header>
   <div class="container">
@@ -230,15 +236,14 @@
       <h3>Order Details</h3>
       <div id="selected-item-details"></div>
       <label for="order-qty">Order Quantity:</label>
-      <input type="number" id="order-qty" class="narrow" placeholder="0000" inputmode="numeric">
-
       <div class="radio-group">
-        <label><input type="radio" name="unit" value="boxes"> Boxes</label>
+        <input type="number" id="order-qty" class="narrow" placeholder="000000" inputmode="numeric">
+        <label><input type="radio" name="unit" value="boxes" checked> Boxes</label>
         <label><input type="radio" name="unit" value="cases"> Cases</label>
       </div>
 
       <label for="special-rate">Special Rate:</label>
-      <input type="number" id="special-rate" class="narrow" placeholder="0000" step="0.01" inputmode="decimal">
+      <input type="number" id="special-rate" class="narrow" placeholder="000000" step="0.01" inputmode="decimal">
 
       <div class="buttons">
         <button class="button-icon" onclick="addToCart()">Add to Cart</button>
@@ -249,10 +254,14 @@
 
   <div id="cart-modal" class="cart-modal">
     <div class="cart-modal-content">
-      <h3>Order Summary (${new Date().toISOString().substring(0, 10)})</h3>
+      <h3>Order Summary</h3>
       <div class="form-group">
         <label for="stockist-name">Stockist Name:</label>
         <input type="text" id="stockist-name" placeholder="Enter stockist name...">
+      </div>
+      <div class="form-group">
+        <label for="order-date">Order Date:</label>
+        <input type="date" id="order-date" value="${new Date().toISOString().substring(0, 10)}">
       </div>
       <div class="form-group">
         <label for="salesman-name">Salesman Name:</label>
@@ -262,13 +271,11 @@
       <div class="buttons">
         <button class="button-icon" onclick="closeCart()" style="background-color: #6c757d;">Close</button>
         <button class="button-icon" onclick="exportToPDF()" style="background-color: #007bff;">Export to PDF</button>
-        <button class="button-icon" onclick="takeScreenshot()" style="background-color: #17a2b8;">Screenshot</button>
       </div>
     </div>
   </div>
 
   <script>
-
     let data = [];
     let cart = [];
 
@@ -280,7 +287,7 @@
         displayItems(json);
       });
 
-    // Display items
+     // Display items
     function displayItems(items) {
       const itemList = document.getElementById('item-list');
       itemList.innerHTML = '';
@@ -350,7 +357,7 @@
         div.className = 'cart-item';
         div.innerHTML = `
           <div class="cart-item-details">
-            ${index + 1}. ${itemDetails} - <span class="qty">Qty: ${qty}</span> ${unit}${rateDisplay}
+            ${index + 1}. ${itemDetails} - <span class="qty">Qty: ${qty}</span> <span class="unit">${unit}</span>${rateDisplay}
           </div>
         `;
         cartItems.appendChild(div);
@@ -382,17 +389,6 @@
       win.document.close();
       win.print();
     }
-
-    // Take screenshot
-    function takeScreenshot() {
-      html2canvas(document.querySelector(".cart-modal-content")).then(canvas => {
-        let link = document.createElement('a');
-        link.download = 'order-summary.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </body>
 </html>
