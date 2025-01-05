@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ishwar Order System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        .search-bar {
+            margin-bottom: 10px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .item-list {
+            margin-top: 10px;
+        }
+
+        .item {
+            background: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .item:hover {
+            background-color: #e8f5e9;
+        }
+
+        .item h3 {
+            margin: 0 0 5px;
+        }
+
+        .order-form {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .order-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .order-form input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .order-form button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .order-form button:hover {
+            background-color: #0b7dda;
+        }
+
+        .cart-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .cart-button button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .cart-button button:hover {
+            background-color: #0b7dda;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>Ishwar Order System</header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search products...">
+        </div>
+
+        <div class="item-list" id="item-list">
+            <!-- Item templates will be injected here -->
+        </div>
+
+        <div class="order-form" id="order-form">
+            <h3 id="item-name"></h3>
+            <p id="item-details"></p>
+            <label for="order-qty">Order Quantity (Boxes/Cases):</label>
+            <input type="number" id="order-qty" placeholder="Enter quantity">
+            <label for="special-rate">Special Rate:</label>
+            <input type="number" id="special-rate" placeholder="Enter special rate (optional)">
+            <button onclick="addToCart()">Add to Cart</button>
+            <button onclick="goBack()">Cancel</button>
+        </div>
+
+        <div class="cart-button">
+            <button id="checkout">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            { "Sl": 1, "Product Name": "ARTIFLEX COLD & FLU Tablets [Blister]", "Pack": "10's Blister", "Box": "20x10", "Shipper": 50, "MRP": 80, "PTS": 15 },
+            { "Sl": 2, "Product Name": "ARTIFLEX PLUS Tablets [Alu Alu]", "Pack": "10's Alu Alu", "Box": "20x10", "Shipper": 50, "MRP": 99, "PTS": 8 },
+            { "Sl": 3, "Product Name": "ARTIFLEX PLUS Tablets [Blister]", "Pack": "10's Blister", "Box": "20x10", "Shipper": 50, "MRP": 99, "PTS": 6 }
+        ];
+
+        const cart = [];
+        const itemList = document.getElementById('item-list');
+        const orderForm = document.getElementById('order-form');
+        let selectedItem = null;
+
+        function renderItems(filteredItems) {
+            itemList.innerHTML = '';
+            filteredItems.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('item');
+                div.innerHTML = `
+                    <h3>${item["Product Name"]}</h3>
+                    <p><strong>Pack:</strong> ${item["Pack"]}, <strong>Box:</strong> ${item["Box"]}, <strong>Shipper:</strong> ${item["Shipper"]}</p>
+                    <p><strong>MRP:</strong> ₹${item["MRP"]}, <strong>PTS:</strong> ₹${item["PTS"]}</p>
+                `;
+                div.onclick = () => openOrderForm(item);
+                itemList.appendChild(div);
+            });
+        }
+
+        function openOrderForm(item) {
+            selectedItem = item;
+            document.getElementById('item-name').textContent = item["Product Name"];
+            document.getElementById('item-details').innerHTML = `
+                <strong>Pack:</strong> ${item["Pack"]}, 
+                <strong>Shipper:</strong> ${item["Shipper"]}, 
+                <strong>PTS:</strong> ₹${item["PTS"]}`;
+            orderForm.style.display = 'block';
+            itemList.style.display = 'none';
+        }
+
+        function addToCart() {
+            const qty = document.getElementById('order-qty').value;
+            const specialRate = document.getElementById('special-rate').value;
+            if (qty) {
+                cart.push({
+                    "Product Name": selectedItem["Product Name"],
+                    "Pack": selectedItem["Pack"],
+                    "Shipper": selectedItem["Shipper"],
+                    "PTS": selectedItem["PTS"],
+                    "Order Quantity": qty,
+                    "Special Rate": specialRate || "N/A"
+                });
+                alert("Item added to cart!");
+                goBack();
+            } else {
+                alert("Please enter order quantity.");
+            }
+        }
+
+        function goBack() {
+            orderForm.style.display = 'none';
+            itemList.style.display = 'block';
+        }
+
+        document.getElementById('search').addEventListener('input', function (e) {
+            const searchValue = e.target.value.toLowerCase();
+            const filteredItems = items.filter(item => item["Product Name"].toLowerCase().includes(searchValue));
+            renderItems(filteredItems);
+        });
+
+        document.getElementById('checkout').addEventListener('click', function () {
+            if (cart.length === 0) {
+                alert("Cart is empty!");
+            } else {
+                let summary = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Pack</th>
+                                <th>Shipper</th>
+                                <th>PTS</th>
+                                <th>Order Quantity</th>
+                                <th>Special Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                cart.forEach(item => {
+                    summary += `
+                        <tr>
+                            <td>${item["Product Name"]}</td>
+                            <td>${item["Pack"]}</td>
+                            <td>${item["Shipper"]}</td>
+                            <td>₹${item["PTS"]}</td>
+                            <td>${item["Order Quantity"]}</td>
+                            <td>${item["Special Rate"]}</td>
+                        </tr>
+                    `;
+                });
+                summary += "</tbody></table>";
+                document.body.innerHTML = summary; // Replace the page with the summary
+            }
+        });
+
+        // Initial render
+        renderItems(items);
+    </script>
+</body>
+</html>
